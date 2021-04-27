@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "年轻人的第一篇博客"
-subtitle: 'First blog from a young man'
+subtitle: 'First blog of a young man'
 author: "louis"
 mathjax: true
 header-style: text
