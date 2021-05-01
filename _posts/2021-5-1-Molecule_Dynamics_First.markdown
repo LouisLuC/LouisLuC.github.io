@@ -1,3 +1,16 @@
+---
+layout: post
+title: "分子动力学模拟案例"
+subtitle: 'Example of Moleculer Dynamics'
+author: "louis"
+mathjax: true
+header-style: text
+tags:
+  - Bioinformatics
+  - Moleculer Dynamics
+  - CADD
+---
+
 ## Introduce
 
 这里的GROMACS的版本为2021的3月8日的release(2021.1 released March 8th, 2021)
@@ -140,7 +153,7 @@ $ gmx grompp -f MD-simulation-files/ions.mdp -c psn2-t-w.gro -p psn2-t.top -o io
 - -f: 参数文件
 - -c: .gro或者其他结构文件
 - -p: .top拓扑文件
-- -maxwarn: 设置允许的warnings的文件。默认允许waranings太低的话将不会输出文件
+- -maxwarn: 设置允许的warnings的文件。默认wen jian允许waranings太低的话将不会输出文件
 - -o: .tpr输出，原子级别的体系的描述
 
 这个命令会有WARNING或者NOTE，告知用户该体系的电荷没有屁股很高，以及算法上的注意事项等等
@@ -171,7 +184,7 @@ $ gmx grompp -f MD-simulation-files/ions.mdp -c psn2-t-w.gro -p psn2-t.top -o io
 使用如下的命令为体系添加电荷
 
 ```shell
-$ gmx genion -s ions.tpr -o psn2-t-w-i.gro -p psn2-t.top -neutral -pname NA
+$ gmx genion -s ions.tpr -o psn2-t-w-i.gro -p psn2-t.top -neutral -pname NA -nname CL
 ```
 
 - -s: **_.tpr_** 文件
@@ -194,17 +207,44 @@ NA               12
 
 加了溶剂以及平衡了体系的电荷之后，在我们进行模拟之前，需要确保体系的几何构型的正确、没有原子之间没有碰撞等问题，放映为不合理的构象以及偏高的能量。经过能量最小化，体系的构象会更加合理。
 
-再次使用 ***grompp***程序产生原子级别的体系描述文件
+打开 ***em.mbp*** 文件，建其中的 emtol 更改为500.0，即将停止优化的最大的力的阈值设为 500 *kJ/mol/nm*
+
+再次使用 ***grompp*** 程序，使用参数文件 ***em.mdp*** 产生原子级别的体系描述文件
 
 ```bash
-$ gmx grompp -f MD-simulation-files/em.mdp -c psn2-t-w-i.gro -p psn2.top -o em.tpr
+$ gmx grompp -f MD-simulation-files/em.mdp -c psn2-t-w-i.gro -p psn2-t.top -o em.tpr #done
 ```
 
+根据这套体系描述文件进行能量最小化
 
+```sh
+$ gmx mdrun -v -deffnm em
+```
+
+- -v: 显示每一步的过程以及该过程中体系的一些参数，这些参数包括
+  - Dmax: 
+  - Epot:  potential energy. should be negative, and (for a simple protein in water) on the order of 10<sup>5</sup>-10<sup>6</sup>
+  - Fmax: maximum force, Fmax, the target for which was set in em.mdp by the *emtol* argument.
+  - atom: 原子的数目
+
+跑完后会回显总的能量优化结果，如下
+
+```
+Steepest Descents converged to Fmax < 500 in 2153 steps
+Potential Energy  = -8.1771481e+05
+Maximum force     =  4.8815460e+02 on atom 4500
+Norm of force     =  1.0691059e+01
+```
+
+将能量最小化过程中的每一步的能量画图展示出来
+
+
+
+用pymol打开最开始的模型和能量最小化后的模型比较
 
 蛋白出盒子
 
-氢键分析选一个区域来算氢键，必须选某个区域所有的原子来算氢键
+wen jian氢键分析选一个区域来算氢键，必须选某个区域所有的原子来算氢键
 
 编辑mdp文件来看信息
 
