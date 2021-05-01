@@ -52,24 +52,20 @@ public class A extends B implements C
 {
   private String name;
   private int age;
-  public A(String name, int age)
-  {
+  public A(String name, int age) {
     this.name = name;
     this.age  = age;
   }
 
-  public void say()
-  {
+  public void say() {
     System.out.println("I am " + name + "and I am " + age + " years old!")
   }
 
-  public String toString()
-  {
+  public String toString() {
     return "<A: name: " + name + " age: " + age + ">"
   }
 
-  public static void main(Stirng[] args)
-  {
+  public static void main(Stirng[] args) {
     A a = new A("a", 10)
     a.say()
   }
